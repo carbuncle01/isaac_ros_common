@@ -42,6 +42,9 @@ if [[ ! -z "${CONFIG_IMAGE_KEY}" ]]; then
 fi
 
 ISAAC_ROS_DEV_DIR="${ISAAC_ROS_WS}"
+SCRIPTS_DIR=$(realpath "${ISAAC_ROS_WS}/../scripts")
+DEBUG_DIR=$(realpath "${ISAAC_ROS_WS}/../debug")
+PYTHON_WS=$(realpath "${ISAAC_ROS_WS}/../python_ws")
 SKIP_IMAGE_BUILD=0
 VERBOSE=0
 VALID_ARGS=$(getopt -o hvd:i:ba: --long help,verbose,isaac_ros_dev_dir:,image_key:,skip_image_build,docker_arg: -- "$@")
@@ -229,6 +232,7 @@ DOCKER_ARGS+=("-e NVIDIA_VISIBLE_DEVICES=all")
 DOCKER_ARGS+=("-e NVIDIA_DRIVER_CAPABILITIES=all")
 DOCKER_ARGS+=("-e ROS_DOMAIN_ID")
 DOCKER_ARGS+=("-e USER")
+DOCKER_ARGS+=("-e USERNAME=admin")
 DOCKER_ARGS+=("-e ISAAC_ROS_WS=/workspaces/isaac_ros-dev")
 DOCKER_ARGS+=("-e HOST_USER_UID=`id -u`")
 DOCKER_ARGS+=("-e HOST_USER_GID=`id -g`")
@@ -239,20 +243,33 @@ if [[ -n $SSH_AUTH_SOCK ]]; then
     DOCKER_ARGS+=("-e SSH_AUTH_SOCK=/ssh-agent")
 fi
 
+# Jetson/aarch64 特有のマウントとデバイス
 if [[ $PLATFORM == "aarch64" ]]; then
-    DOCKER_ARGS+=("-e NVIDIA_VISIBLE_DEVICES=nvidia.com/gpu=all,nvidia.com/pva=all")
-    DOCKER_ARGS+=("-v /usr/bin/tegrastats:/usr/bin/tegrastats")
-    DOCKER_ARGS+=("-v /tmp/:/tmp/")
-    DOCKER_ARGS+=("-v /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra")
-    DOCKER_ARGS+=("-v /usr/src/jetson_multimedia_api:/usr/src/jetson_multimedia_api")
-    DOCKER_ARGS+=("--pid=host")
-    DOCKER_ARGS+=("-v /usr/share/vpi3:/usr/share/vpi3")
-    DOCKER_ARGS+=("-v /dev/input:/dev/input")
+  DOCKER_ARGS+=("-e NVIDIA_VISIBLE_DEVICES=nvidia.com/gpu=all,nvidia.com/pva=all")
+  DOCKER_ARGS+=("-v /usr/bin/tegrastats:/usr/bin/tegrastats")
+  DOCKER_ARGS+=("-v /tmp/:/tmp/")
+  DOCKER_ARGS+=("-v /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra")
+  DOCKER_ARGS+=("-v /usr/src/jetson_multimedia_api:/usr/src/jetson_multimedia_api")
+  DOCKER_ARGS+=("--pid=host")
+  DOCKER_ARGS+=("-v /usr/share/vpi3:/usr/share/vpi3")
+  DOCKER_ARGS+=("-v /dev/input:/dev/input")
+  # デバイスが存在する場合のみマウント
+  [[ -e /dev/gpiochip0 ]] && DOCKER_ARGS+=("--device /dev/gpiochip0")
+  [[ -e /dev/i2c-7 ]] && DOCKER_ARGS+=("--device /dev/i2c-7")
 
-    # If jtop present, give the container access
-    if [[ $(getent group jtop) ]]; then
-        DOCKER_ARGS+=("-v /run/jtop.sock:/run/jtop.sock:ro")
-    fi
+  # jtop が存在する場合のみ
+  if [[ $(getent group jtop) ]]; then
+    DOCKER_ARGS+=("-v /run/jtop.sock:/run/jtop.sock:ro")
+  fi
+fi
+
+# x86_64 の場合は最小限
+if [[ $PLATFORM == "x86_64" ]]; then
+  # GPU がある場合のみ NVIDIA_VISIBLE_DEVICES を設定
+  if command -v nvidia-smi &>/dev/null; then
+    DOCKER_ARGS+=("-e NVIDIA_VISIBLE_DEVICES=all")
+    DOCKER_ARGS+=("-e NVIDIA_DRIVER_CAPABILITIES=all")
+  fi
 fi
 
 # Optionally load custom docker arguments from file
@@ -281,15 +298,19 @@ if [[ $VERBOSE -eq 1 ]]; then
     set -x
 fi
 docker run -it --rm \
-    --privileged \
-    --network host \
-    --ipc=host \
-    ${DOCKER_ARGS[@]} \
-    -v $ISAAC_ROS_DEV_DIR:/workspaces/isaac_ros-dev \
-    -v /etc/localtime:/etc/localtime:ro \
-    --name "$CONTAINER_NAME" \
-    --runtime nvidia \
-    --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh \
-    --workdir /workspaces/isaac_ros-dev \
-    $BASE_NAME \
-    /bin/bash
+  --privileged \
+  --network host \
+  --ipc=host \
+  ${DOCKER_ARGS[@]} \
+  -v $ISAAC_ROS_DEV_DIR:/workspaces/ \
+  -v /etc/localtime:/etc/localtime:ro \
+  -v /var/run/dbus:/var/run/dbus \
+  -v "$SCRIPTS_DIR:/scripts" \
+  -v "$DEBUG_DIR:/debug" \
+  -v "$PYTHON_WS:/python_ws" \
+  --name "$CONTAINER_NAME" \
+  --runtime nvidia \
+  --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh \
+  --workdir /workspaces \
+  $BASE_NAME \
+  /bin/bash

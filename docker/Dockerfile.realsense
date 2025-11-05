@@ -11,34 +11,21 @@
 ARG BASE_IMAGE=ubuntu:22.04
 FROM ${BASE_IMAGE}
 
-ARG LIBREALSENSE_SOURCE_VERSION=v2.55.1
-ARG REALSENSE_ROS_GIT_URL=https://github.com/NVIDIA-ISAAC-ROS/realsense-ros.git
-ARG REALSENSE_ROS_VERSION=release/4.51.1-isaac
+# ==============================================================================
+# Intel RealSense SDK Installation (Optimized)
+# ==============================================================================
 
-COPY scripts/build-librealsense.sh /opt/realsense/build-librealsense.sh
-COPY scripts/install-realsense-dependencies.sh /opt/realsense/install-realsense-dependencies.sh
+# 5. Intel RealSense公開キーを登録
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
 
-RUN chmod +x /opt/realsense/install-realsense-dependencies.sh && \
-    /opt/realsense/install-realsense-dependencies.sh; \
-    chmod +x /opt/realsense/build-librealsense.sh && /opt/realsense/build-librealsense.sh -v ${LIBREALSENSE_SOURCE_VERSION};
-
-# Copy hotplug script for udev rules/hotplug for RealSense
-RUN mkdir -p /opt/realsense/
-COPY scripts/hotplug-realsense.sh /opt/realsense/hotplug-realsense.sh
-COPY udev_rules/99-realsense-libusb-custom.rules /etc/udev/rules.d/99-realsense-libusb-custom.rules
-
-# Install realsense-ros ROS 2 package
-RUN --mount=type=cache,target=/var/cache/apt \
-    mkdir -p ${ROS_ROOT}/src && cd ${ROS_ROOT}/src \
-    && git clone ${REALSENSE_ROS_GIT_URL} -b ${REALSENSE_ROS_VERSION} \
-    && cd realsense-ros && source ${ROS_ROOT}/setup.bash \
-    && cd realsense2_camera_msgs && bloom-generate rosdebian && fakeroot debian/rules binary \
-    && cd ../ && apt-get install -y ./*.deb && rm ./*.deb \
-    && cd realsense2_description && bloom-generate rosdebian && fakeroot debian/rules binary \
-    && cd ../ && apt-get install -y ./*.deb && rm ./*.deb \
-    && cd realsense2_camera && bloom-generate rosdebian \
-    && sed -i 's/dh_shlibdeps -/dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info -/g' debian/rules \
-    && sed -i 's/ros-humble-librealsense2, //g' debian/control \
-    && fakeroot debian/rules binary \
-    && cd ../ && apt-get install -y ./*.deb && rm ./*.deb \
-    && cd ../ && rm -Rf realsense-ros
+# 6. リポジトリを追加 & 7. RealSense SDKをインストール
+RUN add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        librealsense2-utils \
+        librealsense2-dev \
+    # APTキャッシュもクリーンアップ
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/*

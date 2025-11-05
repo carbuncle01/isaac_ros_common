@@ -1,0 +1,114 @@
+# ============================================================
+# ベース: ISAAC ROS 基本イメージ
+# ============================================================
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+USER root
+SHELL ["/bin/bash", "-c"]
+
+# ============================================================
+# 1. CycloneDDS 設定（頻繁に変えない → 上層でOK）
+# ============================================================
+COPY middleware_profiles/cyclonedds.xml /etc/cyclonedds.xml
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV CYCLONEDDS_URI=file:///etc/cyclonedds.xml
+ENV ROS_DOMAIN_ID=33
+
+# ============================================================
+# 2. admin ユーザーの作成（キャッシュ安定）
+# ============================================================
+ARG HOST_USER_UID=1000
+ARG HOST_USER_GID=1000
+RUN groupadd -f -g $HOST_USER_GID admin && \
+    useradd -o -u $HOST_USER_UID -g $HOST_USER_GID -m -s /bin/bash admin && \
+    echo "admin ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/admin-nopasswd
+
+# ============================================================
+# 3. 作業ディレクトリ設定（キャッシュ安定）
+# ============================================================
+WORKDIR /workspaces
+
+# ============================================================
+# 4. Jetracer 関連ライブラリ（ほぼ固定）
+# ============================================================
+RUN set -x && \
+    cd /tmp && \
+    git clone https://github.com/NVIDIA-AI-IOT/jetracer.git && \
+    cd jetracer && \
+    python3 setup.py install && \
+    pip3 install traitlets questionary jetson-gpio && \
+    cd / && rm -rf /tmp/*
+
+# ============================================================
+# 5. PyTorch & torchvision（バージョン固定なら安定）
+# ============================================================
+RUN pip install torch==2.8.0 torchvision==0.23.0
+
+# ============================================================
+# 6. スクリプト配置（頻度中程度）
+# ============================================================
+COPY scripts/entrypoint_additions/*.sh /usr/local/bin/scripts/entrypoint_additions/
+RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/*.sh || true
+
+# ============================================================
+# 7. APT 関連（頻繁に変更される → 下層に移動）
+# ============================================================
+
+# --- ISAAC ROS 関連 ---
+RUN apt-get update && \
+    apt-get install -y \
+        ros-humble-isaac-ros-jetson \
+        ros-humble-isaac-manipulator \
+        ros-humble-isaac-ros-apriltag \
+        ros-humble-isaac-ros-cloud-control \
+        ros-humble-isaac-ros-benchmark \
+        ros-humble-isaac-ros-common \
+        ros-humble-isaac-ros-compression \
+        ros-humble-isaac-ros-cumotion \
+        ros-humble-isaac-ros-data-tools \
+        ros-humble-isaac-ros-dnn-inference \
+        ros-humble-isaac-ros-dnn-stereo-depth \
+        ros-humble-isaac-ros-examples \
+        ros-humble-isaac-ros-image-pipeline \
+        ros-humble-isaac-ros-image-segmentation \
+        ros-humble-isaac-ros-mapping-and-localization \
+        ros-humble-isaac-ros-nitros \
+        ros-humble-isaac-ros-nvblox \
+        ros-humble-isaac-ros-object-detection \
+        ros-humble-isaac-ros-pose-estimation \
+        ros-humble-isaac-ros-visual-slam \
+        ros-humble-isaac-ros-nova \
+        ros-humble-isaac-ros-noetic-interfaces \
+        ros-humble-isaac-ros-map-localization \
+        ros-humble-isaac-ros-freespace-segmentation \
+        ros-humble-isaac-ros-depth-segmentation \
+        ros-humble-isaac-ros-argus-camera \
+    && rm -rf /var/lib/apt/lists/*
+    
+# --- ROS 関連 ---
+RUN apt-get update && \
+    apt-get install -y \
+        ros-humble-ackermann-msgs \
+    && rm -rf /var/lib/apt/lists/*
+
+# --- 基本ユーティリティ ---
+RUN apt-get update && \
+    apt-get install -y \
+        tmux \
+        iproute2 \
+        terminator \
+        vim \
+        htop \
+        can-utils \
+        bluez \
+        joystick \
+        git \
+        sshpass \
+        dialog \
+        curl \
+        wget \
+        net-tools \
+        tree \
+    && rm -rf /var/lib/apt/lists/*
+
