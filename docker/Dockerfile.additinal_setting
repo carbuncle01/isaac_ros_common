@@ -90,6 +90,8 @@ RUN apt-get update && \
 RUN apt-get update && \
     apt-get install -y \
         ros-humble-ackermann-msgs \
+        ros-humble-laser-filters \
+        ros-humble-laser-proc \
     && rm -rf /var/lib/apt/lists/*
 
 # --- 基本ユーティリティ ---
