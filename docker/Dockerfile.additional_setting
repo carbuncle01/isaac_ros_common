@@ -55,36 +55,16 @@ RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/*.sh || true
 # 7. APT 関連（頻繁に変更される → 下層に移動）
 # ============================================================
 
-# --- ISAAC ROS 関連 ---
+# --- ISAAC ROS (APT available subset only) ---
 RUN apt-get update && \
     apt-get install -y \
-        ros-humble-isaac-ros-jetson \
-        ros-humble-isaac-manipulator \
         ros-humble-isaac-ros-apriltag \
-        ros-humble-isaac-ros-cloud-control \
-        ros-humble-isaac-ros-benchmark \
-        ros-humble-isaac-ros-common \
-        ros-humble-isaac-ros-compression \
-        ros-humble-isaac-ros-cumotion \
-        ros-humble-isaac-ros-data-tools \
-        ros-humble-isaac-ros-dnn-inference \
-        ros-humble-isaac-ros-dnn-stereo-depth \
-        ros-humble-isaac-ros-examples \
         ros-humble-isaac-ros-image-pipeline \
-        ros-humble-isaac-ros-image-segmentation \
-        ros-humble-isaac-ros-mapping-and-localization \
-        ros-humble-isaac-ros-nitros \
-        ros-humble-isaac-ros-nvblox \
-        ros-humble-isaac-ros-object-detection \
-        ros-humble-isaac-ros-pose-estimation \
         ros-humble-isaac-ros-visual-slam \
-        ros-humble-isaac-ros-nova \
-        ros-humble-isaac-ros-noetic-interfaces \
-        ros-humble-isaac-ros-map-localization \
-        ros-humble-isaac-ros-freespace-segmentation \
-        ros-humble-isaac-ros-depth-segmentation \
-        ros-humble-isaac-ros-argus-camera \
-    && rm -rf /var/lib/apt/lists/*
+        ros-humble-isaac-ros-nvblox \
+        ros-humble-isaac-ros-nitros \
+        ros-humble-isaac-ros-examples && \
+    rm -rf /var/lib/apt/lists/*
     
 # --- ROS 関連 ---
 RUN apt-get update && \
