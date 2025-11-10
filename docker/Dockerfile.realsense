@@ -6,26 +6,30 @@
 # distribution of this software and related documentation without an express
 # license agreement from NVIDIA CORPORATION is strictly prohibited.
 
-# Dockerfile for setting up Realsense driver
-#  https://github.com/jetsonhacks/installRealSenseSDK
+# Dockerfile for setting up RealSense driver
+#   Reference: https://github.com/jetsonhacks/installRealSenseSDK
 ARG BASE_IMAGE=ubuntu:22.04
 FROM ${BASE_IMAGE}
 
 # ==============================================================================
-# Intel RealSense SDK Installation (Optimized)
+# Intel RealSense SDK Installation (Hardened + Modernized)
 # ==============================================================================
 
-# 5. Intel RealSense公開キーを登録
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
+# === 1. apt設定更新: Origin/Label変更を許可してIsaac ROSのapt更新エラーを回避 ===
+RUN apt-get update --allow-releaseinfo-change --allow-releaseinfo-change-origin --allow-releaseinfo-change-label || true
 
-# 6. リポジトリを追加 & 7. RealSense SDKをインストール
-RUN add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
+# === 2. RealSense公開鍵を安全に登録（apt-key非推奨対応） ===
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl gnupg2 lsb-release ca-certificates && \
+    curl -fsSL https://librealsense.intel.com/Debian/librealsense.pgp | gpg --dearmor -o /usr/share/keyrings/librealsense.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/librealsense.gpg] https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" \
+      > /etc/apt/sources.list.d/librealsense.list
+
+# === 3. RealSense SDKインストール ===
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         librealsense2-utils \
-        librealsense2-dev \
-    # APTキャッシュもクリーンアップ
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /tmp/*
+        librealsense2-dev && \
+    # === 4. クリーンアップ ===
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
