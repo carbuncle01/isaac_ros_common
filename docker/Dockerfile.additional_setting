@@ -72,7 +72,7 @@ RUN apt-get update && \
         ros-humble-ackermann-msgs \
         ros-humble-laser-filters \
         ros-humble-laser-proc \
-        ros-humblecamera-info-manager \
+        ros-humble-camera-info-manager \
     && rm -rf /var/lib/apt/lists/*
 
 # --- 基本ユーティリティ ---
