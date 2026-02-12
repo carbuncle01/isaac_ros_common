@@ -13,7 +13,7 @@ SHELL ["/bin/bash", "-c"]
 COPY middleware_profiles/cyclonedds.xml /etc/cyclonedds.xml
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV CYCLONEDDS_URI=file:///etc/cyclonedds.xml
-ENV ROS_DOMAIN_ID=33
+ENV ROS_DOMAIN_ID=50
 
 # ============================================================
 # 2. admin ユーザーの作成（キャッシュ安定）
@@ -72,6 +72,7 @@ RUN apt-get update && \
         ros-humble-ackermann-msgs \
         ros-humble-laser-filters \
         ros-humble-laser-proc \
+        ros-humblecamera-info-manager \
     && rm -rf /var/lib/apt/lists/*
 
 # --- 基本ユーティリティ ---
