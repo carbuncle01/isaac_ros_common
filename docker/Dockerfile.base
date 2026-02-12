@@ -87,9 +87,8 @@ RUN wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && rm get-pi
 
 # Add Isaac apt repository
 RUN --mount=type=cache,target=/var/cache/apt \
-    wget -qO - https://isaac.download.nvidia.com/isaac-ros/repos.key | apt-key add - && \
-    grep -qxF "deb https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) release-3.0" /etc/apt/sources.list || \
-    echo "deb https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) release-3.0" | tee -a /etc/apt/sources.list \
+    wget -qO - https://isaac.download.nvidia.com/isaac-ros/repos.key | gpg --dearmor -o /usr/share/keyrings/isaac-ros-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/isaac-ros-archive-keyring.gpg] https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) release-3.0" | tee /etc/apt/sources.list.d/isaac-ros.list > /dev/null \
     && apt-get update
 
 # Core dev libraries
