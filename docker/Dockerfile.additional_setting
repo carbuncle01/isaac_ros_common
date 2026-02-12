@@ -55,16 +55,16 @@ RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/*.sh || true
 # 7. APT 関連（頻繁に変更される → 下層に移動）
 # ============================================================
 
-# --- ISAAC ROS (APT available subset only) ---
-RUN apt-get update && \
-    apt-get install -y \
-        ros-humble-isaac-ros-apriltag \
-        ros-humble-isaac-ros-image-pipeline \
-        ros-humble-isaac-ros-visual-slam \
-        ros-humble-isaac-ros-nvblox \
-        ros-humble-isaac-ros-nitros \
-        ros-humble-isaac-ros-examples && \
-    rm -rf /var/lib/apt/lists/*
+# # --- ISAAC ROS (APT available subset only) ---
+# RUN apt-get update && \
+#     apt-get install -y \
+#         ros-humble-isaac-ros-apriltag \
+#         ros-humble-isaac-ros-image-pipeline \
+#         ros-humble-isaac-ros-visual-slam \
+#         ros-humble-isaac-ros-nvblox \
+#         ros-humble-isaac-ros-nitros \
+#         ros-humble-isaac-ros-examples && \
+#     rm -rf /var/lib/apt/lists/*
     
 # --- ROS 関連 ---
 RUN apt-get update && \
