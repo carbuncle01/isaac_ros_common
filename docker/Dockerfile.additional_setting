@@ -66,6 +66,8 @@ RUN pip install \
     "numpy>=2.0.1,<3.0.0" \
     "lark-parser>=0.12.0,<0.13.0"
     
+RUN ln -s /usr/local/lib/python3.10/dist-packages/numpy/_core/include /usr/local/lib/python3.10/dist-packages/numpy/core/include
+
 # ============================================================
 # 6. スクリプト配置（頻度中程度）
 # ============================================================
