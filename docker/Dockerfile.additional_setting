@@ -29,9 +29,11 @@ RUN groupadd -f -g $HOST_USER_GID admin && \
 # ============================================================
 WORKDIR /workspaces
 
+
 # ============================================================
-# 4. Jetracer 関連ライブラリ（ほぼ固定）
+# 4. ライブラリのインストール
 # ============================================================
+# JetRacer ライブラリのインストール
 RUN set -x && \
     cd /tmp && \
     git clone https://github.com/NVIDIA-AI-IOT/jetracer.git && \
@@ -39,6 +41,15 @@ RUN set -x && \
     python3 setup.py install && \
     pip3 install traitlets questionary jetson-gpio && \
     cd / && rm -rf /tmp/*
+
+# YDLIDAR SDK のインストール
+RUN set -x && \
+    cd /tmp && \
+    git clone https://github.com/YDLIDAR/YDLidar-SDK.git && \
+    cd YDLidar-SDK/build && \
+    cmake .. && \
+    make && \
+    sudo make install
 
 # ============================================================
 # 5. PyTorch & torchvision（バージョン固定なら安定）
