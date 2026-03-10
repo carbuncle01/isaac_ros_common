@@ -54,6 +54,16 @@ RUN set -x && \
     make && \
     sudo make install
 
+## x86_64 PCのみ f1tenth_gym をインストール
+RUN set -x && \
+    if [ "$(uname -m)" = "x86_64" ]; then \
+        cd /tmp && \
+        git clone https://github.com/carbuncle01/f1tenth_gym.git && \
+        cd f1tenth_gym && \
+        pip install -e . ; \
+    fi
+
+
 # ============================================================
 # 5. PyTorch & torchvision（バージョン固定なら安定）
 # ============================================================
