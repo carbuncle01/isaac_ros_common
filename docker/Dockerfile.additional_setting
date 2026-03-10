@@ -16,10 +16,11 @@ ENV CYCLONEDDS_URI=file:///etc/cyclonedds.xml
 ENV ROS_DOMAIN_ID=50
 
 # ============================================================
-# 2. admin ユーザーの作成（キャッシュ安定）
+# 2. admin ユーザーの作成（キャッシュ安定・UID競合解消付き）
 # ============================================================
 ARG HOST_USER_UID=1000
 ARG HOST_USER_GID=1000
+RUN if id -nu $HOST_USER_UID >/dev/null 2>&1; then userdel -f $(id -nu $HOST_USER_UID); fi || true
 RUN groupadd -f -g $HOST_USER_GID admin && \
     useradd -o -u $HOST_USER_UID -g $HOST_USER_GID -m -s /bin/bash admin && \
     echo "admin ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/admin-nopasswd
