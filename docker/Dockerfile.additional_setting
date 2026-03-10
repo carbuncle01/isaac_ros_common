@@ -7,6 +7,11 @@ FROM ${BASE_IMAGE}
 USER root
 SHELL ["/bin/bash", "-c"]
 
+RUN apt-get update && \
+    apt-get install -y \
+        iproute2 \
+    && rm -rf /var/lib/apt/lists/*
+
 # ============================================================
 # 1. CycloneDDS 設定（頻繁に変えない → 上層でOK）
 # ============================================================
