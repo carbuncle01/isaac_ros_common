@@ -58,8 +58,8 @@ RUN set -x && \
 RUN set -x && \
     if [ "$(uname -m)" = "x86_64" ]; then \
         cd /tmp && \
-        git clone -b magp https://github.com/carbuncle01/f1tenth_gym.git && \
-        cd f1tenth_gym && \
+        git clone -b jax https://github.com/carbuncle01/f1tenth_gym_jax.git && \
+        cd f1tenth_gym_jax && \
         pip install -e . ; \
     fi
 
