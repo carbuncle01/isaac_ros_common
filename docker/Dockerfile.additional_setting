@@ -60,7 +60,10 @@ RUN set -x && \
         cd /tmp && \
         git clone -b jax https://github.com/carbuncle01/f1tenth_gym_jax.git && \
         cd f1tenth_gym_jax && \
-        pip install -e . ; \
+        pip install --no-cache-dir -e . && \
+        pip uninstall -y jax jaxlib && \
+        pip install --no-cache-dir "jax[cuda12]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html && \
+        cd / && rm -rf /tmp/f1tenth_gym_jax/.git; \
     fi
 
 
