@@ -107,20 +107,7 @@ RUN set -x && \
     if [ "$(uname -m)" = "x86_64" ]; then \
         pip uninstall -y jax jaxlib && \
         pip install --no-cache-dir "jax[cuda12]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html; \
-    fiRUN set -x && \
-    if [ "$(uname -m)" = "x86_64" ]; then \
-        cd /tmp && \
-        git clone -b jax https://github.com/carbuncle01/f1tenth_gym_jax.git && \
-        cd f1tenth_gym_jax && \
-        pip install --no-cache-dir . && \
-        pip uninstall -y jax jaxlib && \
-        pip install --no-cache-dir "jax[cuda12]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html && \
-        cd / && rm -rf /tmp/f1tenth_gym_jax; \
     fi
-
-# Pythonのパスを全体で設定（マウントしたコードを優先読み込み）
-ENV PYTHONPATH=/python_ws:/python_ws/f1tenth_gym_jax:/usr/local/lib/python3.10/dist-packages:/home/admin/.local/lib/python3.10/site-packages
-
 
 # Pythonのパスを全体で設定
 # コンテナ起動時にマウントされる /python_ws と /python_ws/f1tenth_gym_jax を優先読み込み
