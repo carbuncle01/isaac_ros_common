@@ -45,6 +45,13 @@ ISAAC_ROS_DEV_DIR="${ISAAC_ROS_WS}"
 SCRIPTS_DIR=$(realpath "${ISAAC_ROS_WS}/../scripts")
 DEBUG_DIR=$(realpath "${ISAAC_ROS_WS}/../debug")
 PYTHON_WS=$(realpath "${ISAAC_ROS_WS}/../python_ws")
+RECORD_DIR=$(realpath "${ISAAC_ROS_WS}/../record")
+
+if [ ! -d "$RECORD_DIR" ]; then
+    mkdir -p "$RECORD_DIR"
+    print_info "Created missing record directory at $RECORD_DIR"
+fi
+
 SKIP_IMAGE_BUILD=0
 VERBOSE=0
 VALID_ARGS=$(getopt -o hvd:i:ba: --long help,verbose,isaac_ros_dev_dir:,image_key:,skip_image_build,docker_arg: -- "$@")
@@ -308,6 +315,7 @@ docker run -it --rm \
   -v "$SCRIPTS_DIR:/scripts" \
   -v "$DEBUG_DIR:/debug" \
   -v "$PYTHON_WS:/python_ws" \
+  -v "$RECORD_DIR:/record" \
   --name "$CONTAINER_NAME" \
   --runtime nvidia \
   --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh \
