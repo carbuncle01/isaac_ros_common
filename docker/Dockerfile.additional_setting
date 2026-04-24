@@ -148,6 +148,9 @@ RUN apt-get update && \
         ros-humble-laser-filters \
         ros-humble-laser-proc \
         ros-humble-camera-info-manager \
+        ros-humble-cartographer \
+        ros-humble-cartographer-ros \ 
+        ros-humble-cartographer-rviz 
     && rm -rf /var/lib/apt/lists/*
 
 # --- 基本ユーティリティ ---
