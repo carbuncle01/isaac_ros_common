@@ -150,7 +150,12 @@ RUN apt-get update && \
         ros-humble-camera-info-manager \
         ros-humble-cartographer \
         ros-humble-cartographer-ros \ 
-        ros-humble-cartographer-rviz 
+        ros-humble-cartographer-rviz \
+        ros-humble-gxf-isaac-ros-cuda \
+        ros-humble-gxf-isaac-localization \
+        ros-humble-isaac-ros-test \
+        ros-humble-gxf-isaac-cuda \
+        ros-humble-gxf-isaac-flatscan-localization \
     && rm -rf /var/lib/apt/lists/*
 
 # --- 基本ユーティリティ ---
