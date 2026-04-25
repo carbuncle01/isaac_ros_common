@@ -156,6 +156,8 @@ RUN apt-get update && \
         ros-humble-isaac-ros-test \
         ros-humble-gxf-isaac-cuda \
         ros-humble-gxf-isaac-flatscan-localization \
+        ros-humble-rqt-tf-tree \
+        ros-humble-tf2-tools \
     && rm -rf /var/lib/apt/lists/*
 
 # --- 基本ユーティリティ ---
