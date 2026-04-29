@@ -46,10 +46,16 @@ SCRIPTS_DIR=$(realpath "${ISAAC_ROS_WS}/../scripts")
 DEBUG_DIR=$(realpath "${ISAAC_ROS_WS}/../debug")
 PYTHON_WS=$(realpath "${ISAAC_ROS_WS}/../python_ws")
 RECORD_DIR=$(realpath "${ISAAC_ROS_WS}/../record")
+MAP_DIR=$(realpath "${ISAAC_ROS_WS}/../map")
 
 if [ ! -d "$RECORD_DIR" ]; then
     mkdir -p "$RECORD_DIR"
     print_info "Created missing record directory at $RECORD_DIR"
+fi
+
+if [ ! -d "$MAP_DIR" ]; then
+    mkdir -p "$MAP_DIR"
+    print_info "Created missing map directory at $MAP_DIR"
 fi
 
 SKIP_IMAGE_BUILD=0
@@ -316,6 +322,7 @@ docker run -it --rm \
   -v "$DEBUG_DIR:/debug" \
   -v "$PYTHON_WS:/python_ws" \
   -v "$RECORD_DIR:/record" \
+  -v "$MAP_DIR:/map" \
   --name "$CONTAINER_NAME" \
   --runtime nvidia \
   --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh \
