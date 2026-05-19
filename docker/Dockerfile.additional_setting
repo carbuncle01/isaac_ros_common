@@ -168,6 +168,7 @@ RUN apt-get update && \
         ros-humble-gxf-isaac-flatscan-localization \
         ros-humble-rqt-tf-tree \
         ros-humble-tf2-tools \
+        ros-humble-image-transport-plugins \
     && rm -rf /var/lib/apt/lists/*
 
 # --- 基本ユーティリティ ---
