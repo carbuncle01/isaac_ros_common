@@ -116,6 +116,16 @@ ENV PYTHONPATH=/python_ws:/python_ws/f1tenth_gym_jax:/usr/local/lib/python3.10/d
 RUN ln -s /usr/local/lib/python3.10/dist-packages/numpy/_core/include /usr/local/lib/python3.10/dist-packages/numpy/core/include
 
 # ============================================================
+# 5.6 Race Line (Global Trajectory Optimization) Setup (x86_64 only)
+# ============================================================
+RUN set -x && \
+    if [ "$(uname -m)" = "x86_64" ]; then \
+        pip install --no-cache-dir "matplotlib>=3.5,<4" "scipy>=1.8,<2" && \
+        pip install --no-cache-dir "quadprog>=0.1.11" && \
+        pip install --no-cache-dir "git+https://github.com/TUMFTM/trajectory_planning_helpers.git@master" --no-deps; \
+    fi
+
+# ============================================================
 # 6. スクリプト配置（頻度中程度）
 # ============================================================
 COPY scripts/entrypoint_additions/*.sh /usr/local/bin/scripts/entrypoint_additions/
