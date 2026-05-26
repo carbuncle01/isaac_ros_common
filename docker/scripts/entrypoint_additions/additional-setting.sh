@@ -72,31 +72,6 @@ if [ -c /dev/i2c-7 ]; then
     fi
 fi
 
-# ------------------------------------------------------------
-# 6. YDLIDAR (Serial Port): dialout権限の動的設定 
-# ------------------------------------------------------------
-LIDAR_DEV=""
-[ -c /dev/ydlidar ] && LIDAR_DEV="/dev/ydlidar"
-[ -z "$LIDAR_DEV" ] && [ -c /dev/ttyUSB0 ] && LIDAR_DEV="/dev/ttyUSB0"
-
-if [ -n "$LIDAR_DEV" ]; then
-    HOST_DIALOUT_GID=$(stat -c '%g' "$LIDAR_DEV")
-    print_info "Detected Lidar device ($LIDAR_DEV) GID: ${HOST_DIALOUT_GID}"
-
-    EXISTING_DIALOUT_GROUP=$(getent group ${HOST_DIALOUT_GID} | cut -d: -f1)
-    if [ -n "${EXISTING_DIALOUT_GROUP}" ]; then
-        print_info "Adding '${USER_NAME}' to existing group '${EXISTING_DIALOUT_GROUP}'"
-        usermod -aG "${EXISTING_DIALOUT_GROUP}" "${USER_NAME}"
-    else
-        print_info "Creating dialout_host group with GID ${HOST_DIALOUT_GID}"
-        groupadd -g "${HOST_DIALOUT_GID}" dialout_host
-        usermod -aG dialout_host "${USER_NAME}"
-    fi
-else
-    print_info "WARNING: Lidar device (/dev/ttyUSB0 or /dev/ydlidar) not found."
-fi
-
-
 export ROS_DOMAIN_ID="${ROS_DOMAIN_ID:=0}"
 print_info "Using ROS_DOMAIN_ID=${ROS_DOMAIN_ID}"
 
