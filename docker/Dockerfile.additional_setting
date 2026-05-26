@@ -43,41 +43,8 @@ RUN set -x && \
     pip3 install traitlets questionary jetson-gpio && \
     cd / && rm -rf /tmp/*
 
-# YDLIDAR SDK のインストール
-RUN set -x && \
-    cd /tmp && \
-    git clone https://github.com/YDLIDAR/YDLidar-SDK.git && \
-    cd YDLidar-SDK && \
-    mkdir build && \
-    cd build && \
-    cmake .. && \
-    make && \
-    sudo make install
-
-## x86_64 PCのみ f1tenth_gym をインストール
-RUN set -x && \
-    if [ "$(uname -m)" = "x86_64" ]; then \
-        cd /tmp && \
-        git clone -b jax https://github.com/carbuncle01/f1tenth_gym_jax.git && \
-        cd f1tenth_gym_jax && \
-        pip install --no-cache-dir -e . && \
-        pip uninstall -y jax jaxlib && \
-        pip install --no-cache-dir "jax[cuda12]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html && \
-        cd / && rm -rf /tmp/f1tenth_gym_jax/.git; \
-    fi
-
-
-# ============================================================
-# 5. PyTorch & torchvision（バージョン固定なら安定）
-# ============================================================
-# ============================================================
-# 5. PyTorch & 基本Pythonパッケージ
-# ============================================================
-# PyTorch はバージョン固定でインストール
+# 5. PyTorch & 基本Pythonパッケージのインストール
 RUN pip install torch==2.8.0 torchvision==0.23.0
-
-# いただいた requirements.txt の内容と既存の必須パッケージを統合
-# ※ jax, jaxlib は x86_64 用のブロックで処理するためここには書きません
 RUN pip install \
     "textual>=5.3.0,<6.0.0" \
     "rich>=13.0.0,<14.0.0" \
@@ -101,21 +68,6 @@ RUN pip install \
 RUN ln -s /usr/local/lib/python3.10/dist-packages/numpy/_core/include /usr/local/lib/python3.10/dist-packages/numpy/core/include
 
 # ============================================================
-# 5.5 x86_64 PCのみ f1tenth_gym_jax と JAX をインストール
-# ============================================================
-RUN set -x && \
-    if [ "$(uname -m)" = "x86_64" ]; then \
-        pip uninstall -y jax jaxlib && \
-        pip install --no-cache-dir "jax[cuda12]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html; \
-    fi
-
-# Pythonのパスを全体で設定
-# コンテナ起動時にマウントされる /python_ws と /python_ws/f1tenth_gym_jax を優先読み込み
-ENV PYTHONPATH=/python_ws:/python_ws/f1tenth_gym_jax:/usr/local/lib/python3.10/dist-packages:/home/admin/.local/lib/python3.10/site-packages
-    
-RUN ln -s /usr/local/lib/python3.10/dist-packages/numpy/_core/include /usr/local/lib/python3.10/dist-packages/numpy/core/include
-
-# ============================================================
 # 5.6 Race Line (Global Trajectory Optimization) Setup (x86_64 only)
 # ============================================================
 RUN set -x && \
@@ -132,7 +84,7 @@ COPY scripts/entrypoint_additions/*.sh /usr/local/bin/scripts/entrypoint_additio
 RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/*.sh || true
 
 # ============================================================
-# 7. APT 関連（頻繁に変更される → 下層に移動）
+# 7. APT 関連
 # ============================================================
 
 # # --- ISAAC ROS (APT available subset only) ---
