@@ -90,17 +90,68 @@ RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/*.sh || true
 # # --- ISAAC ROS (APT available subset only) ---
 RUN apt-get update && \
     apt-get install -y \
-        ros-humble-isaac-ros-apriltag \
-        ros-humble-isaac-ros-benchmark \
+        # ==========================================
+        # Core & Utilities (基本機能・ユーティリティ)
+        # ==========================================
+        ros-humble-isaac-common \
         ros-humble-isaac-ros-common \
-        ros-humble-isaac-ros-cumotion \
-        ros-humble-isaac-ros-examples \
-        ros-humble-isaac-ros-image-pipeline \
         ros-humble-isaac-ros-nitros \
-        ros-humble-isaac-ros-nvblox \
-        ros-humble-isaac-ros-visual-slam \
+        ros-humble-isaac-ros-examples \
+        ros-humble-isaac-ros-launch-utils \
+        ros-humble-isaac-ros-jetson-stats \
+        \
+        # ==========================================
+        # Sensors & Cameras (センサー・カメラサポート)
+        # ==========================================
         ros-humble-isaac-ros-nova \
         ros-humble-isaac-ros-argus-camera \
+        ros-humble-isaac-ros-hawk \
+        ros-humble-isaac-ros-owl \
+        ros-humble-isaac-ros-realsense \
+        ros-humble-isaac-ros-usb-cam \
+        ros-humble-isaac-ros-zed \
+        ros-humble-isaac-ros-hesai \
+        ros-humble-isaac-ros-imu-bmi088 \
+        \
+        # ==========================================
+        # Vision & Deep Learning (画像処理・推論モデル)
+        # ==========================================
+        ros-humble-isaac-ros-image-pipeline \
+        ros-humble-isaac-ros-apriltag \
+        ros-humble-isaac-ros-bi3d \
+        ros-humble-isaac-ros-centerpose \
+        ros-humble-isaac-ros-detectnet \
+        ros-humble-isaac-ros-dope \
+        ros-humble-isaac-ros-ess \
+        ros-humble-isaac-ros-foundationpose \
+        ros-humble-isaac-ros-rtdetr \
+        ros-humble-isaac-ros-segformer \
+        ros-humble-isaac-ros-segment-anything \
+        ros-humble-isaac-ros-unet \
+        ros-humble-isaac-ros-yolov8 \
+        \
+        # ==========================================
+        # Mapping, Localization & SLAM (自己位置推定・マッピング)
+        # ==========================================
+        ros-humble-isaac-mapping-ros \
+        ros-humble-isaac-ros-nvblox \
+        ros-humble-isaac-ros-visual-slam \
+        ros-humble-isaac-ros-occupancy-grid-localizer \
+        ros-humble-isaac-ros-visual-global-localization \
+        \
+        # ==========================================
+        # Manipulation & Navigation (マニピュレーション・ナビゲーション)
+        # ==========================================
+        ros-humble-isaac-ros-cumotion \
+        ros-humble-isaac-manipulator-bringup \
+        ros-humble-isaac-ros-vda5050-nav2-client \
+        \
+        # ==========================================
+        # Data & Recording (データ記録・再生)
+        # ==========================================
+        ros-humble-isaac-ros-data-recorder \
+        ros-humble-isaac-ros-data-replayer \
+        ros-humble-isaac-ros-rosbag-utils \
     && rm -rf /var/lib/apt/lists/*
     
 # --- ROS 関連 ---
