@@ -103,15 +103,15 @@ RUN apt-get update && \
         # ==========================================
         # Sensors & Cameras (センサー・カメラサポート)
         # ==========================================
-        ros-humble-isaac-ros-nova \
-        ros-humble-isaac-ros-argus-camera \
-        ros-humble-isaac-ros-hawk \
-        ros-humble-isaac-ros-owl \
+        # ros-humble-isaac-ros-nova \
+        # ros-humble-isaac-ros-argus-camera \
+        # ros-humble-isaac-ros-hawk \
+        # ros-humble-isaac-ros-owl \
         ros-humble-isaac-ros-realsense \
-        ros-humble-isaac-ros-usb-cam \
-        ros-humble-isaac-ros-zed \
-        ros-humble-isaac-ros-hesai \
-        ros-humble-isaac-ros-imu-bmi088 \
+        # ros-humble-isaac-ros-usb-cam \
+        # ros-humble-isaac-ros-zed \
+        # ros-humble-isaac-ros-hesai \
+        # ros-humble-isaac-ros-imu-bmi088 \
         \
         # ==========================================
         # Vision & Deep Learning (画像処理・推論モデル)
