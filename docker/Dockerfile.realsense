@@ -12,7 +12,7 @@ ARG BASE_IMAGE=ubuntu:22.04
 FROM ${BASE_IMAGE}
 
 ARG LIBREALSENSE_SOURCE_VERSION=v2.55.1
-ARG REALSENSE_ROS_GIT_URL=https://github.com/NVIDIA-ISAAC-ROS/realsense-ros.git
+ARG REALSENSE_ROS_GIT_URL=https://github.com/carbuncle01/realsense-ros.git
 ARG REALSENSE_ROS_VERSION=release/4.51.1-isaac
 
 COPY scripts/build-librealsense.sh /opt/realsense/build-librealsense.sh
